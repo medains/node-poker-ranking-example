@@ -10,7 +10,7 @@ Poker.evaluateHand = function(hand,callback){
 }
 
 Poker.getWinnerString = function(gameid,callback) {
-    var _game, _players, _hands, _handvalues;
+    var _game, _players=[], _hands=[], _handvalues=[];
     var self = this;
     function fetchGame(next) {
         self.helper.fetchGame(gameid,function(err,game){
@@ -40,6 +40,11 @@ Poker.getWinnerString = function(gameid,callback) {
             next();
         });
     }
+    function zip(arrays) {
+        return Array.apply(null,Array(arrays[0].length)).map(function(_,i){
+            return arrays.map(function(array){return array[i]})
+        });
+    }
     async.series({
         getGame: fetchGame,
         getPlayers: fetchPlayers,
@@ -48,7 +53,40 @@ Poker.getWinnerString = function(gameid,callback) {
         },
         function(err,results) {
             if(err) return callback(err);
-            callback( null, '' );
+            var r = zip( [_players, _handvalues] );
+            async.reduce( r, {type:-1, value:-1, out:'', players:[]}, function(memo,item,next) {
+                if( item[1].type > memo.type ) {
+                    // new winner, better hand
+                    memo.players = [ item[0] ];
+                    memo.out = item[1].desc;
+                    memo.type = item[1].type;
+                    memo.value = item[1].value;
+                } else if( item[1].type == memo.type ) {
+                    if( item[1].value > memo.value ) {
+                        // new winner, same hand, but better value
+                        memo.players = [ item[0] ];
+                        memo.out = item[1].desc;
+                        memo.type = item[1].type;
+                        memo.value = item[1].value;
+                    } else {
+                        if( item[1].value == memo.value ) {
+                            // joint winner
+                            memo.players.push( item[0] );
+                        }
+                    }
+                }
+                next(null, memo);
+            },function(err,result){
+                if( err ) return callback(err);
+                if( !result.players || result.players.length == 0 ) {
+                    return callback( null, 'No winner' );
+                }
+                var str = '';
+                if( result.players.length == 1 ) {
+                    str = "Player " + result.players[0] + " wins with " + result.out;
+                }
+                callback( null, str );
+            });
         }
     );
 }

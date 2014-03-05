@@ -27,7 +27,7 @@ describe('Poker', function(){
             };
             game.getPlayers.yields(null,[]);
             poker.helper.fetchGame.yields(null,game);
-            sinon.stub(poker,'evaluateHand').yields(null,{type:0,value:0,description:""});
+            sinon.stub(poker,'evaluateHand').yields(null,{type:0,value:0,desc:""});
             done();
         });
         afterEach(function(done){
@@ -77,6 +77,16 @@ describe('Poker', function(){
                 sinon.assert.callCount( poker.evaluateHand, 2 );
                 sinon.assert.calledWith( poker.evaluateHand, "hand a" );
                 sinon.assert.calledWith( poker.evaluateHand, "hand b" );
+                done();
+            });
+        });
+        it('reduces evalulated hands to winner string', function(done) {
+            game.getPlayers.yields(null,[1]);
+            setupHands({1:"hand a"});
+            poker.evaluateHand.reset();
+            poker.evaluateHand.yields(null,{type:0,value:0,desc:'Winning hand'});
+            poker.getWinnerString(1,function(err,st) {
+                assert.equal( st, "Player 1 wins with Winning hand" );
                 done();
             });
         });

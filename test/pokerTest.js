@@ -7,7 +7,6 @@ describe('Poker', function(){
     describe('getWinnerString', function() {
         var helper;
         var game;
-        var players;
         function setupHands(hands){
             Object.keys(hands).forEach(function(player){
                 game.getHand.withArgs(player).yields(null, hands[player]);
@@ -22,8 +21,8 @@ describe('Poker', function(){
                 getPlayers : sinon.stub(),
                 getHand    : sinon.stub()
             };
-            players = [];
-            game.getPlayers.yields(null,players);
+            game.getPlayers.yields(null,[]);
+            game.getHand.yields(null,"");
             poker.helper.fetchGame.yields(null,game);
             done();
         });
@@ -46,6 +45,20 @@ describe('Poker', function(){
         it('fetches the players from the game', function(done) {
             poker.getWinnerString(1,function(err,st) {
                 sinon.assert.calledOnce( game.getPlayers );
+                done();
+            });
+        });
+        it('fetches the hands for each player (no players)', function(done) {
+            poker.getWinnerString(1,function(err,st) {
+                sinon.assert.callCount( game.getHand, 0 );
+                done();
+            });
+        });
+        it('fetches the hands for each player (3 players)', function(done) {
+            game.getPlayers.yields(null,[1,2,3]);
+            setupHands({1:"",2:"",3:""});
+            poker.getWinnerString(1,function(err,st) {
+                sinon.assert.callCount( game.getHand, 3 );
                 done();
             });
         });

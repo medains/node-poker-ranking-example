@@ -1,5 +1,6 @@
 var assert = require('assert'),
     sinon = require('sinon'),
+    async = require('async'),
     util = require('util');
 var poker = require('../src/poker');
 
@@ -112,6 +113,87 @@ describe('Poker', function(){
             poker.getWinnerString(1,function(err,st) {
                 assert.equal( st, "Players 1, 2 and 3 win with Winning hand" );
                 done();
+            });
+        });
+    });
+    describe('evaluateHand',function(){
+        var results = {};
+        var hands = [
+    { key: 'Royal flush in diamonds', desc: 'Royal flush',
+        cards: 'AD KD QD JD TD', type: poker.STRAIGHT_FLUSH,  },
+    { key: 'King high Straight flush', desc: 'King high straight flush',
+        cards: 'KD QD JD TD 9D', type: poker.STRAIGHT_FLUSH,  },
+    { key: 'Royal flush in hearts', desc: 'Royal flush',
+        cards: 'AH KH QH JH TH', type: poker.STRAIGHT_FLUSH,  },
+    { key: 'Four aces', desc: 'Four aces',
+        cards: 'AH AD AC AS TH', type: poker.FOUR_OF_A_KIND,  },
+    { key: 'Full house', desc: 'Full house, aces over tens',
+        cards: 'AD AH AC TS TD', type: poker.FULL_HOUSE,  },
+    { key: 'Flush', desc: 'Flush',
+        cards: '9D 6D 5D 4D 2D', type: poker.FLUSH,  },
+    { key: 'Straight', desc: 'Ace high straight',
+        cards: 'AC KD QD JD TD', type: poker.STRAIGHT,  },
+    { key: 'Three of a kind', desc: 'Three aces',
+        cards: 'AD AH AC 7S TD', type: poker.THREE_OF_A_KIND,  },
+    { key: 'Two pair', desc: 'Two pairs, eights over sevens',
+        cards: '8D 8H 7C 7S TD', type: poker.TWO_PAIR,  },
+    { key: 'Two pair A/8', desc: 'Two pairs, aces over eights',
+        cards: 'AD 8H AC 8S TD', type: poker.TWO_PAIR,  },
+    { key: 'Pair of eights', desc: 'Pair of eights',
+        cards: '8D 8H 3C 7S TD', type: poker.ONE_PAIR,  },
+    { key: 'Seven High', desc: 'Seven high',
+        cards: '7D 6H 5C 4S 2D', type: poker.HIGH_CARD,  },
+    { key: 'Pair of twos', desc: 'Pair of twos',
+        cards: '2D 2S 3S 4S 5D', type: poker.ONE_PAIR,  },
+    { key: 'Ace High', desc: 'Ace high',
+        cards: 'AH 6H 5D 4S 2H', type: poker.HIGH_CARD,  },
+        ];
+        var compare_types = [
+            { first: 'Royal flush in diamonds', second: 'King high Straight flush', equal: true },
+            { first: 'Royal flush in diamonds', second: 'Royal flush in hearts', equal: true },
+            { first: 'Ace High', second: 'Seven High', equal: true },
+        ];
+        var compare_values = [
+            { first: 'Royal flush in diamonds', second: 'King high Straight flush', equal: false },
+            { first: 'Ace High', second: 'Seven High', equal: false },
+            { first: 'Royal flush in diamonds', second: 'Royal flush in hearts', equal: true }
+        ];
+        before(function(done){
+            async.each(hands,function(hand,next){
+                poker.evaluateHand(hand.cards,function(err,result){
+                    if(err) return next(err);
+                    results[hand.key] = result;
+                    next();
+                });
+            },function(err){
+                if(err) throw err;
+                done();
+            });
+        });
+        hands.forEach(function(hand){
+            it('identifies a ' + hand.key, function() {
+                assert.equal( results[hand.key].type, hand.type );
+                assert.equal( results[hand.key].desc, hand.desc );
+            });
+        });
+        compare_types.forEach(function(data){
+            it('returns ' + (data.equal?'the same':'a higher') + ' type for ' +
+               data.first + ' in comparison to ' + data.second, function(){
+               if( data.equal ) {
+                   assert.equal( results[data.first].type, results[data.second].type );
+               } else {
+                   assert.ok( results[data.first].type > results[data.second].type );
+               }
+            });
+        });
+        compare_values.forEach(function(data){
+            it('returns ' + (data.equal?'the same':'a higher') + ' value for ' +
+               data.first + ' in comparison to ' + data.second, function(){
+               if( data.equal ) {
+                   assert.equal( results[data.first].value, results[data.second].value );
+               } else {
+                   assert.ok( results[data.first].value > results[data.second].value );
+               }
             });
         });
     });

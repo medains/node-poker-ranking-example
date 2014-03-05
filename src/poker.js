@@ -23,9 +23,17 @@ Poker.getWinnerString = function(gameid,callback) {
             next();
         });
     }
+    function fetchHands(next) {
+        async.map(_players,_game.getHand,function(err,hands){
+            if( err ) return next(err);
+            _hands = hands;
+            next();
+        });
+    }
     async.series({
         getGame: fetchGame,
-        getPlayers: fetchPlayers
+        getPlayers: fetchPlayers,
+        getHands: fetchHands
         },
         function(err,results) {
             if(err) return callback(err);

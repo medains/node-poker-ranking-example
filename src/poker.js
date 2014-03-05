@@ -1,8 +1,14 @@
+var PokerGameHelper = require('./pokerGameHelper');
+
 function Poker() {
 }
 
+Poker.helper = PokerGameHelper;
+
 Poker.getWinnerString = function(gameid,callback) {
-    callback(null,'');
+    this.helper.fetchGame(gameid,function(err,game){
+        callback(null,'');
+    });
 }
 
 module.exports = Poker;

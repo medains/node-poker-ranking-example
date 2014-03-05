@@ -1,10 +1,11 @@
 {
-    "name": "poker-kata",
-    "version": "1.0.0",
-    "dependencies": {
-    },
-    "devDependencies": {
-        "mocha": "latest",
-        "sinon": "latest"
-    }
+  "name": "poker-kata",
+  "version": "1.0.0",
+  "dependencies": {
+    "async": "~0.2.10"
+  },
+  "devDependencies": {
+    "mocha": "latest",
+    "sinon": "latest"
+  }
 }

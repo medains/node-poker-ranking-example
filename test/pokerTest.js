@@ -5,8 +5,11 @@ var poker = require('../src/poker');
 
 describe('Poker', function(){
     describe('getWinnerString', function() {
-        it('returns string', function(){
-            assert.ok( typeof poker.getWinnerString(1) === 'string' );
+        it('returns string', function(done){
+            poker.getWinnerString(1,function(err,st) {
+                assert.ok( typeof(st) === 'string' );
+                done();
+            });
         });
     });
 });

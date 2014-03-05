@@ -1,8 +1,8 @@
 function PokerGameHelper() {
 }
 
-PokerGameHelper.fetchGame = function(gameid) {
-    throw "Accessing MYSQL, DOH!";
+PokerGameHelper.fetchGame = function(gameid,callback) {
+    callback( new Error( "Accessing MYSQL, DOH!" ) );
 }
 
 module.exports = PokerGameHelper;

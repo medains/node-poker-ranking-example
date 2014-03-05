@@ -7,7 +7,9 @@ Poker.helper = PokerGameHelper;
 
 Poker.getWinnerString = function(gameid,callback) {
     this.helper.fetchGame(gameid,function(err,game){
-        callback(null,'');
+        game.getPlayers(function(err,players){
+            callback(null,'');
+        });
     });
 }
 

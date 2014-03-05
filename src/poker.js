@@ -84,6 +84,9 @@ Poker.getWinnerString = function(gameid,callback) {
                 var str = '';
                 if( result.players.length == 1 ) {
                     str = "Player " + result.players[0] + " wins with " + result.out;
+                } else {
+                    var last = result.players.pop();
+                    str = "Players " + result.players.join(", ") + " and " + last + " win with " + result.out;
                 }
                 callback( null, str );
             });

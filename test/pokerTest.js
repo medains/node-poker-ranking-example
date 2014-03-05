@@ -81,12 +81,36 @@ describe('Poker', function(){
             });
         });
         it('reduces evalulated hands to winner string', function(done) {
-            game.getPlayers.yields(null,[1]);
-            setupHands({1:"hand a"});
+            game.getPlayers.yields(null,[1,2,3]);
+            setupHands({1:"hand a",2:"hand b",3:"hand c"});
             poker.evaluateHand.reset();
-            poker.evaluateHand.yields(null,{type:0,value:0,desc:'Winning hand'});
+            poker.evaluateHand.withArgs("hand c").yields(null,{type:1,value:1,desc:'Winning hand'});
+            poker.evaluateHand.withArgs("hand b").yields(null,{type:0,value:0,desc:'Losing hand'});
+            poker.evaluateHand.withArgs("hand a").yields(null,{type:1,value:0,desc:'Losing hand'});
             poker.getWinnerString(1,function(err,st) {
-                assert.equal( st, "Player 1 wins with Winning hand" );
+                assert.equal( st, "Player 3 wins with Winning hand" );
+                done();
+            });
+        });
+        it('reduces evalulated hands to winner string (joint winners)', function(done) {
+            game.getPlayers.yields(null,[1,2,3]);
+            setupHands({1:"hand a",2:"hand b",3:"hand c"});
+            poker.evaluateHand.reset();
+            poker.evaluateHand.withArgs("hand a").yields(null,{type:1,value:0,desc:'Winning hand'});
+            poker.evaluateHand.withArgs("hand b").yields(null,{type:1,value:0,desc:'Winning hand'});
+            poker.evaluateHand.withArgs("hand c").yields(null,{type:0,value:0,desc:'Losing hand'});
+            poker.getWinnerString(1,function(err,st) {
+                assert.equal( st, "Players 1 and 2 win with Winning hand" );
+                done();
+            });
+        });
+        it('reduces evalulated hands to winner string (three winners)', function(done) {
+            game.getPlayers.yields(null,[1,2,3]);
+            setupHands({1:"hand a",2:"hand b",3:"hand c"});
+            poker.evaluateHand.reset();
+            poker.evaluateHand.yields(null,{type:1,value:0,desc:'Winning hand'});
+            poker.getWinnerString(1,function(err,st) {
+                assert.equal( st, "Players 1, 2 and 3 win with Winning hand" );
                 done();
             });
         });

@@ -36,7 +36,7 @@ function getName(v,cap){
 }
 Poker.evaluateHand = function(hand,callback){
     var result = {
-        type: this.HIGH_CARD,
+        type: Poker.HIGH_CARD,
         value: 0,
         desc: 'Straight flush'
     };
@@ -95,20 +95,20 @@ Poker.evaluateHand = function(hand,callback){
     result.value = handValue;
     if( range == 4 && most == 1 && values['A'] == 0 ) {
         if( mostSuit == 5 ) {
-            result.type = this.STRAIGHT_FLUSH;
+            result.type = Poker.STRAIGHT_FLUSH;
             result.desc = getName(highest,true)+ ' high straight flush';
         } else {
-            result.type = this.STRAIGHT;
+            result.type = Poker.STRAIGHT;
             result.desc = getName(highest,true)+ ' high straight';
         }
     } else if( range == 3 && most == 1 && values['A'] == 1 && (values['2'] == 1 || values['K'] == 1 ) ) {
         if( mostSuit == 5 ) {
-            result.type = this.STRAIGHT_FLUSH;
+            result.type = Poker.STRAIGHT_FLUSH;
             if( values['K'] > 0 ) {
                 result.desc = 'Royal flush';
             }
         } else {
-            result.type = this.STRAIGHT;
+            result.type = Poker.STRAIGHT;
             if( values['K'] > 0 ) {
                 result.desc = 'Ace high straight';
             } else {
@@ -116,22 +116,22 @@ Poker.evaluateHand = function(hand,callback){
             }
         }
     } else if( mostSuit == 5 ) {
-        result.type = this.FLUSH;
+        result.type = Poker.FLUSH;
         result.desc = 'Flush';
     } else if( most == 4 ) {
-        result.type = this.FOUR_OF_A_KIND;
+        result.type = Poker.FOUR_OF_A_KIND;
         result.desc = 'Four ' + getName(mostValue,false) + 's';
     } else if( most == 3 ) {
         if( pairCount == 1 ) {
-            result.type = this.FULL_HOUSE;
+            result.type = Poker.FULL_HOUSE;
             result.desc = 'Full house, ' + getName(threeVal,false) + 's over ' +
                 getName(pairVals[0],false) + 's';
         } else {
-            result.type = this.THREE_OF_A_KIND;
+            result.type = Poker.THREE_OF_A_KIND;
             result.desc = 'Three ' + getName(mostValue,false) + 's';
         }
     } else if( pairCount == 2 ) {
-        result.type = this.TWO_PAIR;
+        result.type = Poker.TWO_PAIR;
         pairVals.sort(function(a,b){
             if( b == 0 ) return 1;
             if( a == 0 ) return -1;
@@ -140,7 +140,7 @@ Poker.evaluateHand = function(hand,callback){
         result.desc = 'Two pairs, ' + getName(pairVals[0],false) + 's over ' +
             getName(pairVals[1],false) + 's';
     } else if( pairCount == 1 ) {
-        result.type = this.ONE_PAIR;
+        result.type = Poker.ONE_PAIR;
         result.desc = 'Pair of ' + getName(pairVals[0],false) + 's';
     } else {
         if( values['A'] > 0 ) {

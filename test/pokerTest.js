@@ -7,10 +7,9 @@ describe('Poker', function(){
     describe('getWinnerString', function() {
         var helper;
         var game;
-        function setupHands(hands){
-            Object.keys(hands).forEach(function(player){
-                game.getHand.withArgs(player).yields(null, hands[player]);
-            });
+        var hands;
+        function setupHands(_hands){
+            hands = _hands;
         }
         beforeEach(function(done){
             helper = poker.helper;
@@ -19,15 +18,21 @@ describe('Poker', function(){
             };
             game = {
                 getPlayers : sinon.stub(),
-                getHand    : sinon.stub()
+                getHand    : sinon.spy(function(player,callback){
+                    if( hands[player] ) {
+                        return callback(null, hands[player]);
+                    }
+                    callback( null, "" );
+                })
             };
             game.getPlayers.yields(null,[]);
-            game.getHand.yields(null,"");
             poker.helper.fetchGame.yields(null,game);
+            sinon.stub(poker,'evaluateHand').yields(null,{type:0,value:0,description:""});
             done();
         });
         afterEach(function(done){
             poker.helper = helper;
+            poker.evaluateHand.restore();
             done();
         });
         it('returns string', function(done){
@@ -59,6 +64,19 @@ describe('Poker', function(){
             setupHands({1:"",2:"",3:""});
             poker.getWinnerString(1,function(err,st) {
                 sinon.assert.callCount( game.getHand, 3 );
+                sinon.assert.calledWith( game.getHand, 1 );
+                sinon.assert.calledWith( game.getHand, 2 );
+                sinon.assert.calledWith( game.getHand, 3 );
+                done();
+            });
+        });
+        it('evaluates each hand', function(done) {
+            game.getPlayers.yields(null,[1,2]);
+            setupHands({1:"hand a",2:"hand b"});
+            poker.getWinnerString(1,function(err,st) {
+                sinon.assert.callCount( poker.evaluateHand, 2 );
+                sinon.assert.calledWith( poker.evaluateHand, "hand a" );
+                sinon.assert.calledWith( poker.evaluateHand, "hand b" );
                 done();
             });
         });

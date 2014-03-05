@@ -6,8 +6,11 @@ function Poker() {
 
 Poker.helper = PokerGameHelper;
 
+Poker.evaluateHand = function(hand,callback){
+}
+
 Poker.getWinnerString = function(gameid,callback) {
-    var _game, _players;
+    var _game, _players, _hands, _handvalues;
     var self = this;
     function fetchGame(next) {
         self.helper.fetchGame(gameid,function(err,game){
@@ -30,10 +33,18 @@ Poker.getWinnerString = function(gameid,callback) {
             next();
         });
     }
+    function fetchHandValues(next) {
+        async.map(_hands,self.evaluateHand,function(err,handvalues){
+            if( err ) return next(err);
+            _handvalues = handvalues;
+            next();
+        });
+    }
     async.series({
         getGame: fetchGame,
         getPlayers: fetchPlayers,
-        getHands: fetchHands
+        getHands: fetchHands,
+        evalHands: fetchHandValues
         },
         function(err,results) {
             if(err) return callback(err);

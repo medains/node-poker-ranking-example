@@ -1,7 +1,7 @@
 node-poker-ranking
 ==================
 
-This repository contains base files to perform the expanded "Poker hand ranking"
+This repository contains an example solution to the expanded "Poker hand ranking"
 code kata.
 
 ## Instructions for the Kata
@@ -27,4 +27,3 @@ npm install
 node_module/.bin/mocha -w
 ```
 
-A failing test has already been written in test/pokerTest.js as a starting point.

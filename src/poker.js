@@ -7,6 +7,7 @@ function Poker() {
 Poker.helper = PokerGameHelper;
 
 Poker.evaluateHand = function(hand,callback){
+    // TODO - implement
 }
 
 Poker.getWinnerString = function(gameid,callback) {

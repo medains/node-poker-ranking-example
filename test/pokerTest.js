@@ -135,7 +135,7 @@ describe('Poker', function(){
         cards: 'AC KD QD JD TD', type: poker.STRAIGHT,  },
     { key: 'Three of a kind', desc: 'Three aces',
         cards: 'AD AH AC 7S TD', type: poker.THREE_OF_A_KIND,  },
-    { key: 'Two pair', desc: 'Two pairs, eights over sevens',
+    { key: 'Two pair 8/7', desc: 'Two pairs, eights over sevens',
         cards: '8D 8H 7C 7S TD', type: poker.TWO_PAIR,  },
     { key: 'Two pair A/8', desc: 'Two pairs, aces over eights',
         cards: 'AD 8H AC 8S TD', type: poker.TWO_PAIR,  },
@@ -147,16 +147,38 @@ describe('Poker', function(){
         cards: '2D 2S 3S 4S 5D', type: poker.ONE_PAIR,  },
     { key: 'Ace High', desc: 'Ace high',
         cards: 'AH 6H 5D 4S 2H', type: poker.HIGH_CARD,  },
+    { key: 'Ace High low kicker', desc: 'Ace high',
+        cards: 'AD 6D 5H 4C 3H', type: poker.HIGH_CARD,  },
         ];
         var compare_types = [
+            // Equal types of hands
             { first: 'Royal flush in diamonds', second: 'King high Straight flush', equal: true },
             { first: 'Royal flush in diamonds', second: 'Royal flush in hearts', equal: true },
             { first: 'Ace High', second: 'Seven High', equal: true },
+            { first: 'Ace High', second: 'Ace High low kicker', equal: true },
+            { first: 'Pair of twos', second: 'Pair of eights', equal: true },
+            { first: 'Two pair A/8', second: 'Two pair 8/7', equal: true },
+            // Ensure hand order is correct
+            { first: 'King high Straight flush', second: 'Four aces', equal: false },
+            { first: 'Four aces', second: 'Full house', equal: false },
+            { first: 'Full house', second: 'Flush', equal: false },
+            { first: 'Flush', second: 'Straight', equal: false },
+            { first: 'Straight', second: 'Three of a kind', equal: false },
+            { first: 'Three of a kind', second: 'Two pair A/8', equal: false },
+            { first: 'Two pair 8/7', second: 'Pair of twos', equal: false },
+            { first: 'Pair of twos', second: 'Ace High', equal: false },
         ];
         var compare_values = [
+            // Some hands really are equal
+            { first: 'Royal flush in diamonds', second: 'Royal flush in hearts', equal: true },
+            // Differences within a type of hand
             { first: 'Royal flush in diamonds', second: 'King high Straight flush', equal: false },
+            // highest card
             { first: 'Ace High', second: 'Seven High', equal: false },
-            { first: 'Royal flush in diamonds', second: 'Royal flush in hearts', equal: true }
+            // two pair values
+            { first: 'Two pair A/8', second: 'Two pair 8/7', equal: false },
+            // Lowest card kicker
+            { first: 'Ace High low kicker', second: 'Ace High', equal: false },
         ];
         before(function(done){
             async.each(hands,function(hand,next){
